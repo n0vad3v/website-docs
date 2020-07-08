@@ -51,7 +51,7 @@ jobs:
         with:
           path: ./
           key: ${{ github.event.client_payload.sha }}
-          restore-key: |
+          restore-keys: |
             ${{ runner.os }}-${{ github.event.client_payload.sha }}
             ${{ runner.os }}-
 
