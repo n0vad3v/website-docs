@@ -1,33 +1,43 @@
-name: Update docs on schedule and repository_dispatch
+name: Test serilize workflow
 on:
-  schedule:
-    - cron: '0 0 * * *'
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
   repository_dispatch:
-    types: [updated]
+    types: [triggered]
 jobs:
   run:
-    name: Retrieve docs and deploy the website
+    name: Build website
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      
+      - name: print payload
+        run: 'echo "field: ${{ github.event.client_payload.gitsha }}"'
+      
+      - name: action turnstyle
+        uses: softprops/turnstyle@v0.1.2
 
-      - name: Set known_hosts
-        id: know-hosts
-        run: |
-          echo "::set-output name=BJ1::$(ssh-keyscan -H ${{ secrets.BJ_1_HOST }})"
-          echo "::set-output name=BJ2::$(ssh-keyscan -H ${{ secrets.BJ_2_HOST }})"
-          echo "::set-output name=LA1::$(ssh-keyscan -H ${{ secrets.LA_1_HOST }})"
-          echo "::set-output name=LA2::$(ssh-keyscan -H ${{ secrets.LA_2_HOST }})"
+      # - name: Set known_hosts
+      #   id: know-hosts
+      #   run: |
+      #     echo "::set-output name=BJ1::$(ssh-keyscan -H ${{ secrets.BJ_1_HOST }})"
+      #     echo "::set-output name=BJ2::$(ssh-keyscan -H ${{ secrets.BJ_2_HOST }})"
+      #     echo "::set-output name=LA1::$(ssh-keyscan -H ${{ secrets.LA_1_HOST }})"
+      #     echo "::set-output name=LA2::$(ssh-keyscan -H ${{ secrets.LA_2_HOST }})"
 
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_KEY }}
-          known_hosts: |
-            ${{ steps.know-hosts.outputs.BJ1 }}
-            ${{ steps.know-hosts.outputs.BJ2 }}
-            ${{ steps.know-hosts.outputs.LA1 }}
-            ${{ steps.know-hosts.outputs.LA2 }}
+      # - name: Install SSH Key
+      #   uses: shimataro/ssh-key-action@v2
+      #   with:
+      #     key: ${{ secrets.SSH_KEY }}
+      #     known_hosts: |
+      #       ${{ steps.know-hosts.outputs.BJ1 }}
+      #       ${{ steps.know-hosts.outputs.BJ2 }}
+      #       ${{ steps.know-hosts.outputs.LA1 }}
+      #       ${{ steps.know-hosts.outputs.LA2 }}
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -46,19 +56,19 @@ jobs:
       - name: Install deps
         run: yarn
 
-      - name: Download docs-tidb
-        run: |
-          GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb:en:all
-          GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb:zh:all
+      # - name: Download docs-tidb
+      #   run: |
+      #     GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb:en:all
+      #     GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb:zh:all
 
-      - name: Download docs-tidb-operator
-        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb-operator:all
+      # - name: Download docs-tidb-operator
+      #   run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb-operator:all
 
       - name: Download docs-dm
         run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:all
 
-      - name: Download docs-dbaas
-        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dbaas
+      # - name: Download docs-dbaas
+      #   run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dbaas
 
 
       - name: Restore gatsby cache
@@ -66,8 +76,9 @@ jobs:
         id: gatsby-cache
         with:
           path: ./.cache
-          key: ${{ runner.os }}-gatsby-cache-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-gatsby-cache-${{ github.sha }}
           restore-keys: |
+            ${{ runner.os }}-gatsby-cache-${{ github.sha }}
             ${{ runner.os }}-gatsby-cache-${{ hashFiles('yarn.lock') }}
             ${{ runner.os }}-gatsby-cache-
 
@@ -76,8 +87,9 @@ jobs:
         id: gatsby-build
         with:
           path: ./public
-          key: ${{ runner.os }}-gatsby-build-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-gatsby-build-${{ github.sha }}
           restore-keys: |
+            ${{ runner.os }}-gatsby-build-${{ github.sha }}
             ${{ runner.os }}-gatsby-build-${{ hashFiles('yarn.lock') }}
             ${{ runner.os }}-gatsby-build-
 
@@ -87,10 +99,18 @@ jobs:
       - name: Move changed files from gatsby
         run: (yes|cp -f .cache/*Pages.txt public)|true
 
+      - name: List public
+        run: ls ./public
 
-      - name: Deploy
-        run: |
-          rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
-          rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_2_HOST }}:${{ secrets.DEPLOY_PATH }}"
-          rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.LA_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
-          rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.LA_2_HOST }}:${{ secrets.DEPLOY_PATH }}"
+      - name: cat new page
+        run : cat ./public/newPages.txt
+      
+      - name: cat deleted page
+        run : cat ./public/deletedPages.txt
+
+      # - name: Deploy
+      #   run: |
+      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
+      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_2_HOST }}:${{ secrets.DEPLOY_PATH }}"
+      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.LA_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
+      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.LA_2_HOST }}:${{ secrets.DEPLOY_PATH }}"
