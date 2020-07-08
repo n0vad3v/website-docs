@@ -40,6 +40,20 @@ jobs:
       #       ${{ steps.know-hosts.outputs.BJ2 }}
       #       ${{ steps.know-hosts.outputs.LA1 }}
       #       ${{ steps.know-hosts.outputs.LA2 }}
+      
+      - name: Get sha cache path
+        id: get-sha-cache
+        run: echo "::set-output name=shacach::${{ github.event.client_payload.sha }}"
+      
+      - name: Restore sha cache
+        uses: actions/cache@v2
+        id: sha-cache
+        with:
+          path: ./
+          key: ${{ github.event.client_payload.sha }}
+          restore-key: |
+            ${{ runner.os }}-${{ github.event.client_payload.sha }}
+            ${{ runner.os }}-
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
