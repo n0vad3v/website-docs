@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
       
       - name: print payload
-        run: 'echo "field: ${{ github.event.client_payload.gitsha }}"'
+        run: 'echo "field: ${{ github.event.client_payload.sha }}"'
       
       - name: action turnstyle
         uses: softprops/turnstyle@v0.1.2
