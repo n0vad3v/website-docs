@@ -14,8 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.ref }}
       
-      - name: print payload
+      - name: print payload sha
         run: 'echo "field: ${{ github.event.client_payload.sha }}"'
       
       - name: action turnstyle
