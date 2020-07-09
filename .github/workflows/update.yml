@@ -45,11 +45,11 @@ jobs:
       
       - name: Get webhook payload sha
         if: ${{ github.event.client_payload.sha }}
-        run: echo "::set-output name=sha::$(${{ github.event.client_payload.sha }})
+        run: echo "::set-output name=sha::$(${{ github.event.client_payload.sha }})"
       
       - name: Get sha
         if: ${{ github.event.client_payload.sha }} == ''
-        run: echo "::set-output name=sha::$(${{ github.sha }})
+        run: echo "::set-output name=sha::$(${{ github.sha }})"
       
       - name: print sha
         run: 'echo "sha: ${{ steps.get-sha.outputs.sha }}"'
