@@ -57,7 +57,7 @@ jobs:
 
       - name: Restore gatsby cache
         uses: actions/cache@v2
-        if: ${{ github.event.client_payload.sha }} == ''
+        if: ${{ github.event.client_payload.sha }} === ''
         id: gatsby-cache
         with:
           path: ./.cache
