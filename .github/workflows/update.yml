@@ -40,45 +40,24 @@ jobs:
       - name: Install deps
         run: yarn
 
-      # - name: Download docs-tidb
-      #   run: |
-      #     GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb:en:all
-      #     GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb:zh:all
-
-      # - name: Download docs-tidb-operator
-      #   run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb-operator:all
-
       - name: Download docs-dm
         run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:all
-
-      # - name: Download docs-dbaas
-      #   run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dbaas
       
       - name: Get sha
         id: get-sha
         run: echo "::set-output name=sha::$(${{ github.event.client_payload.sha }} && echo ${{ github.event.client_payload.sha }} || echo ${{ github.sha}})"
-
-
+      
+      - name: print sha
+        run: 'echo "sha: ${{ steps.get-sha.outputs.sha }}"'
+      
       - name: Restore gatsby cache
         uses: actions/cache@v2
-        if: ${{ github.event.client_payload.sha }} === ''
-        id: gatsby-cache
-        with:
-          path: ./.cache
-          key: ${{ runner.os }}-gatsby-cache-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-gatsby-cache-${{ github.sha }}
-            ${{ runner.os }}-gatsby-cache-
-            
-      - name: Restore payload gatsby cache
-        uses: actions/cache@v2
-        if: ${{ github.event.client_payload.sha }}
         id: payload-gatsby-cache
         with:
           path: ./.cache
-          key: ${{ runner.os }}-gatsby-cache-${{ github.event.client_payload.sha }}
+          key: ${{ runner.os }}-gatsby-cache-${{ steps.get-sha.outputs.sha }}
           restore-keys: |
-            ${{ runner.os }}-gatsby-cache-${{ github.event.client_payload.sha }}
+            ${{ runner.os }}-gatsby-cache-${{ steps.get-sha.outputs.sha }}
             ${{ runner.os }}-gatsby-cache-
 
       - name: Restore gatsby build
@@ -86,9 +65,9 @@ jobs:
         id: gatsby-build
         with:
           path: ./public
-          key: ${{ runner.os }}-gatsby-build-${{ github.sha }}
+          key: ${{ runner.os }}-gatsby-build-${{ steps.get-sha.outputs.sha }}
           restore-keys: |
-            ${{ runner.os }}-gatsby-build-${{ github.sha }}
+            ${{ runner.os }}-gatsby-build-${{ steps.get-sha.outputs.sha }}
             ${{ runner.os }}-gatsby-build-
 
       - name: Build website
