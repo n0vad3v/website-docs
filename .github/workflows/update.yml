@@ -45,7 +45,7 @@ jobs:
       
       - name: Get sha
         id: get-sha
-        run: echo "::set-output name=sha::$(${{ github.event.client_payload.sha }} && echo ${{ github.event.client_payload.sha }} || echo ${{ github.sha}})"
+        run: echo "::set-output name=sha::$(${{ github.event.client_payload.sha }} ? ${{ github.event.client_payload.sha }}:${{ github.sha }})
       
       - name: print sha
         run: 'echo "sha: ${{ steps.get-sha.outputs.sha }}"'
