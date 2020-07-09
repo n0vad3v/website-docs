@@ -1,4 +1,4 @@
-name: Test serilize workflow
+name: Triggered workflow
 on:
   repository_dispatch:
     types: [triggered]
