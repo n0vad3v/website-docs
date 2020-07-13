@@ -36,9 +36,32 @@ jobs:
 
       - name: Install deps
         run: yarn
+      
+      - name: Restore zh-docs-dm-cache
+        uses: actions/cache@v2
+        id: zh-docs-dm-cache
+        with: 
+          path: ./markdown-pages/contents/zh/docs-dm
+          key: ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+          restore-keys: | 
+            ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.sha }}
 
-      - name: Download docs-dm
-        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:all
+      - name: Download all zh-docs-dm
+        if: steps.zh-docs-dm-cache.outputs.cache-hit != 'true'
+        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:zh:all
+      
+      - name: Restore en-docs-dm-cache
+        uses: actions/cache@v2
+        id: en-docs-dm-cache
+        with: 
+          path: ./markdown-pages/contents/en/docs-dm
+          key: ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+          restore-keys: | 
+            ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+
+      - name: Download all en-docs-dm
+        if: steps.en-docs-dm-cache.outputs.cache-hit != 'true'
+        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:en:all
 
       - name: Restore gatsby cache
         uses: actions/cache@v2
