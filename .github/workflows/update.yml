@@ -45,6 +45,8 @@ jobs:
           key: ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.sha }}
           restore-keys: | 
             ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+            ${{ runner.os }}-zh-docs-dm-cache-build-
+            ${{ runner.os }}-zh
 
       - name: Download all zh-docs-dm
         if: steps.zh-docs-dm-cache.outputs.cache-hit != 'true'
@@ -58,6 +60,8 @@ jobs:
           key: ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.sha }}
           restore-keys: | 
             ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+            ${{ runner.os }}-en-docs-dm-cache-build-
+            ${{ runner.os }}-en
 
       - name: Download all en-docs-dm
         if: steps.en-docs-dm-cache.outputs.cache-hit != 'true'
