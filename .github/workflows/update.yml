@@ -74,8 +74,8 @@ jobs:
       - name: test list
         id: cache-commit
         run: |
-           echo "${{ github.event.client_payload.sha }}" > ./markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
-           hash=$(cat ./markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock)
+           echo "${{ github.event.client_payload.sha }}" > /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
+           hash=$(cat /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock)
            echo "get cache hash: $hash"
            echo "::set-output name=hash::${hash}"
             
