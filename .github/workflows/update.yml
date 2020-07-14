@@ -75,7 +75,7 @@ jobs:
         if: ${{ steps.git-ref.outputs.repo }} != 'website-docs'
         id: cache-commit
         run: |
-           tree /home/runner/work/website-docs/
+           ls /home/runner/work/website-docs/
            echo "${{ github.event.client_payload.sha }}" > /home/runner/work/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
            hash=$(cat /home/runner/work/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock)
            echo "get cache hash: $hash"
