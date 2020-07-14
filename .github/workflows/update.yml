@@ -70,7 +70,7 @@ jobs:
       
       - name: test list
         run: |
-           echo "sdfasfdsa" >> /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/docs-dm/master/hash.txt
+           echo "new hash" >> /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/docs-dm/master/hash.txt
            cat /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/docs-dm/master/hash.txt
             
       - name: Sync docs-dm
