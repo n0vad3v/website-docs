@@ -14,12 +14,15 @@ jobs:
       - name: Turnstyle
         uses: softprops/turnstyle@v1
       
-#       - name: action turnstyle
-#         uses: softprops/turnstyle@v0.1.2
-
+      - name: print 
+        run: | 
+          echo ${{ github.event.client_payload.sha }}
+          echo ${{ github.event.client_payload.ref }}
+          echo ${{ github.event.client_payload.repository }}
+      
       - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Restore yarn cache
         uses: actions/cache@v2
@@ -36,7 +39,7 @@ jobs:
       
       - name: Restore zh-docs-dm-cache
         uses: actions/cache@v2
-        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
+        if: ${{ github.event.client_payload.repository }} == 'YiniXu9506/docs-dm'
         id: zh-docs-dm-cache
         with: 
           path: ./markdown-pages/contents/zh/docs-dm
@@ -48,7 +51,7 @@ jobs:
       
       - name: Restore en-docs-dm-cache
         uses: actions/cache@v2
-        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
+        if: ${{ github.event.client_payload.repository }} == 'YiniXu9506/docs-dm'
         id: en-docs-dm-cache
         with: 
           path: ./markdown-pages/contents/en/docs-dm
@@ -74,7 +77,7 @@ jobs:
            cat /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/docs-dm/master/hash.txt
             
       - name: Sync docs-dm
-        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
+        if: ${{ github.event.client_payload.repository }} == 'YiniXu9506/docs-dm'
         run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync docs-dm ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }}
 
       - name: Restore gatsby cache
@@ -105,16 +108,3 @@ jobs:
 
       - name: List public
         run: ls ./public
-
-#       - name: cat new page
-#         run : cat ./public/newPages.txt
-      
-#       - name: cat deleted page
-#         run : cat ./public/deletedPages.txt
-
-      # - name: Deploy
-      #   run: |
-      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
-      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_2_HOST }}:${{ secrets.DEPLOY_PATH }}"
-      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.LA_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
-      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.LA_2_HOST }}:${{ secrets.DEPLOY_PATH }}"
