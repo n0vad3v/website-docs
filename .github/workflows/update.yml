@@ -13,10 +13,6 @@ jobs:
           
       - name: Turnstyle
         uses: softprops/turnstyle@v1
-  
-      - name: print payload sha
-        run: |
-          'echo "field: ${{ github.event.client_payload.sha }}, ${{ github.event.client_payload.ref }}, ${{ github.event.client_payload.repository }}"'
       
 #       - name: action turnstyle
 #         uses: softprops/turnstyle@v0.1.2
