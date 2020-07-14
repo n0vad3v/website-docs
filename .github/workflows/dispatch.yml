@@ -25,7 +25,7 @@ jobs:
       uses: peter-evans/repository-dispatch@v1.1.1
       with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          repository: yinixu9506/website-docs
+          repository: YiniXu9506/website-docs
           event-type: triggered
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "repository": "${{ github.repository }}"}'
 
