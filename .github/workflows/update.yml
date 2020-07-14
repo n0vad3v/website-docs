@@ -15,7 +15,7 @@ jobs:
         uses: softprops/turnstyle@v1
   
       - name: print payload sha
-        run: 'echo "field: ${{ github.event.client_payload.sha }}, ${{ github.event.client_payload.ref }}, ${{ github.event.client_payload.repo }}"'
+        run: 'echo "field: ${{ github.event.client_payload.sha }}, ${{ github.event.client_payload.ref }}, ${{ github.event.client_payload.repository }}"'
       
 #       - name: action turnstyle
 #         uses: softprops/turnstyle@v0.1.2
@@ -39,6 +39,7 @@ jobs:
       
       - name: Restore zh-docs-dm-cache
         uses: actions/cache@v2
+        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
         id: zh-docs-dm-cache
         with: 
           path: ./markdown-pages/contents/zh/docs-dm
@@ -48,6 +49,18 @@ jobs:
             ${{ runner.os }}-zh-docs-dm-cache-build-
             ${{ runner.os }}-zh
       
+      - name: Restore en-docs-dm-cache
+        uses: actions/cache@v2
+        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
+        id: en-docs-dm-cache
+        with: 
+          path: ./markdown-pages/contents/en/docs-dm
+          key: ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+          restore-keys: | 
+            ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+            ${{ runner.os }}-en-docs-dm-cache-build-
+            ${{ runner.os }}-en
+            
       - name: Split ref
         id: git-ref
         run: |
@@ -59,25 +72,15 @@ jobs:
         run: 'echo "ref: ${{ steps.git-ref.outputs.ref }}"'
       
       - name: test list
-        run: ls /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/docs-dm/master/
-
-      - name: Sync zh-docs-dm
+        run: | 
+           ls /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/docs-dm/master/
+           ls /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/docs-dm/master/
+           echo "sdfasfdsa" >> /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/docs-dm/master/hash.txt
+           cat /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/docs-dm/master/hash.txt
+            
+      - name: Sync docs-dm
+        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
         run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync docs-dm ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }}
-      
-      - name: Restore en-docs-dm-cache
-        uses: actions/cache@v2
-        id: en-docs-dm-cache
-        with: 
-          path: ./markdown-pages/contents/en/docs-dm
-          key: ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.sha }}
-          restore-keys: | 
-            ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.sha }}
-            ${{ runner.os }}-en-docs-dm-cache-build-
-            ${{ runner.os }}-en
-
-      - name: Download all en-docs-dm
-        if: steps.en-docs-dm-cache.outputs.cache-hit != 'true'
-        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:en:all
 
       - name: Restore gatsby cache
         uses: actions/cache@v2
