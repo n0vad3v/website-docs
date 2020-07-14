@@ -77,7 +77,7 @@ jobs:
         run: |
            path=/home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
            hash=""
-           if [ -f $path ];then
+           if [ -f "$path" ];then
            hash=$(cat $path)  
            fi
            echo "${{ github.event.client_payload.sha }}" > $path
