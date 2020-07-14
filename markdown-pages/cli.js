@@ -18,7 +18,7 @@ const argv = yargs
     'specify which repo of docs you want to download'
   )
   .command(
-    'sync <repo> <ref> <sha>',
+    'sync <repo> <ref> <sha> <lsha>',
     "Sync the docs' changes by a single commit"
   ).argv
 
@@ -163,12 +163,15 @@ function sync(argv) {
   const repo = argv.repo
   const ref = argv.ref
   const sha = argv.sha
+  const lastSha = argv.lsha
 
-  sig.info(`Sync Info: repo => ${repo} ref => ${ref} sha => ${sha}`)
+  sig.info(
+    `Sync Info: repo => ${repo} ref => ${ref} sha => ${sha} lastSha => ${lastSha}`
+  )
 
   switch (repo) {
     case 'docs-tidb-operator':
-      handleSync({ owner: 'pingcap', repo, ref, sha }, [
+      handleSync({ owner: 'pingcap', repo, ref, sha, lastSha }, [
         () => createReplaceImagePathStream(TIDB_IN_KUBERNETES_IMAGE_CDN_URL),
         () => createReplaceCopyableStream(),
         () => createReplaceTabPanelStream(),
@@ -176,7 +179,7 @@ function sync(argv) {
 
       break
     case 'docs-dm':
-      handleSync({ owner: 'pingcap', repo, ref, sha }, [
+      handleSync({ owner: 'pingcap', repo, ref, sha, lastSha }, [
         () => createReplaceImagePathStream(TIDB_DATA_MIGRATION_IMAGE_CDN_URL),
         () => createReplaceCopyableStream(),
         () => createReplaceTabPanelStream(),
@@ -185,7 +188,7 @@ function sync(argv) {
       break
 
     case 'dbaas-docs':
-      handleSync({ owner: 'pingcap', repo, ref, sha }, [
+      handleSync({ owner: 'pingcap', repo, ref, sha, lastSha }, [
         () => createReplaceImagePathStream(TIDB_CLOUD_IMAGE_CDN_URL),
         () => createReplaceCopyableStream(),
         () => createReplaceTabPanelStream(),

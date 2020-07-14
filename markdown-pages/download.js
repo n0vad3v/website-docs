@@ -28,6 +28,7 @@ function getCommitInfo(owner, repo, ref) {
 }
 
 async function writeContent(url, distPath, pipelines = []) {
+  console.log('distpath', dis)
   const writeStream = fs.createWriteStream(distPath)
   writeStream.on('close', () => sig.success(`Downloaded: ${url}`))
 
@@ -77,7 +78,7 @@ async function retrieveAllMDs(metaInfo, distDir, pipelines = []) {
 }
 
 async function handleSync(metaInfo, pipelines = []) {
-  const { owner, repo, ref, sha } = metaInfo
+  const { owner, repo, ref, sha, lastSha } = metaInfo
 
   const { files } = (await getCommitInfo(owner, repo, sha)).data
 
@@ -103,7 +104,7 @@ async function handleSync(metaInfo, pipelines = []) {
         writeContent(raw_url, path, pipelines)
 
         break
-      case 'deleted':
+      case 'removed':
         fs.unlink(path, (err) => {
           if (err) {
             sig.error(`Fail to unlink ${path}: ${err}`)
