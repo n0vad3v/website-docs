@@ -103,7 +103,7 @@ async function handleSync(metaInfo, pipelines = []) {
         writeContent(raw_url, path, pipelines)
 
         break
-      case 'deleted':
+      case 'removed':
         fs.unlink(path, (err) => {
           if (err) {
             sig.error(`Fail to unlink ${path}: ${err}`)
