@@ -50,7 +50,10 @@ jobs:
       
       - name: Split ref
         id: git-ref
-        run: echo "::set-output name=ref::$(echo ${{github.event.client_payload.ref##*/}})"
+        run: |
+          branch=${{ github.event.client_payload.ref }}
+          echo $branch
+          echo "::set-output name=ref::${branch##*/}"
       
       - name: Get ref
         run: 'echo "ref: ${{ steps.git-ref.outputs.ref }}"'
