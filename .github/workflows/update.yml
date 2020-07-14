@@ -47,7 +47,7 @@ jobs:
           key: ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
           restore-keys: | 
             ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
-            ${{ runner.os }}-zh-docs-dm-cache-build-
+            ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.ref }}
             ${{ runner.os }}-zh
       
       - name: Restore en-docs-dm-cache
@@ -59,7 +59,7 @@ jobs:
           key: ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
           restore-keys: | 
             ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
-            ${{ runner.os }}-en-docs-dm-cache-build-
+            ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.ref }}
             ${{ runner.os }}-en
             
       - name: Split ref
@@ -96,9 +96,9 @@ jobs:
         id: gatsby-build
         with:
           path: ./public
-          key: ${{ runner.os }}-gatsby-build2-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
+          key: ${{ runner.os }}-gatsby-build2-${{ github.event.client_payload.sha }}
           restore-keys: |
-            ${{ runner.os }}-gatsby-build2-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
+            ${{ runner.os }}-gatsby-build2-${{ github.event.client_payload.sha }}
             ${{ runner.os }}-gatsby-build2-
 
       - name: Build website
