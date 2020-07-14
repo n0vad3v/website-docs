@@ -72,12 +72,12 @@ jobs:
           echo "get ${{ steps.git-ref.outputs.ref }}, ${{ steps.git-ref.outputs.repo }} "
       
       - name: test list
-        if: ${{ steps.git-ref.outputs.repo }} != 'website-docs'
         id: cache-commit
+        if: ${{ steps.git-ref.outputs.repo }} != 'website-docs'
         run: |
            ls /home/runner/work/website-docs/website-docs
-           echo "${{ github.event.client_payload.sha }}" > /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
            hash=$(cat /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock)
+           echo "${{ github.event.client_payload.sha }}" > /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
            echo "get cache hash: $hash"
            echo "::set-output name=hash::${hash}"
             
