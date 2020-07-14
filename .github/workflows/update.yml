@@ -47,10 +47,16 @@ jobs:
             ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.sha }}
             ${{ runner.os }}-zh-docs-dm-cache-build-
             ${{ runner.os }}-zh
+      
+      - name: Split ref
+        id: git-ref
+        run: echo "::set-output name=ref::$(echo ${{github.event.client_payload.ref##*/}})"
+      
+      - name: Get ref
+        run: 'echo "ref: ${{ steps.git-ref.outputs.ref }}"'
 
-      - name: Download all zh-docs-dm
-        if: steps.zh-docs-dm-cache.outputs.cache-hit != 'true'
-        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:zh:all
+      - name: Sync zh-docs-dm
+        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync docs-dm ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }}
       
       - name: Restore en-docs-dm-cache
         uses: actions/cache@v2
