@@ -15,7 +15,11 @@ jobs:
         uses: softprops/turnstyle@v1
   
       - name: print payload sha
-        run: 'echo "field: ${{ github.event.client_payload.sha }}, ${{ github.event.client_payload.ref }}, ${{ github.event.client_payload.repository }}"'
+        run: |
+          'echo "field: ${{ github.event.client_payload.sha }}, ${{ github.event.client_payload.ref }}, ${{ github.event.client_payload.repository }}"'
+          sha=${{ github.event.client_payload.sha }}
+          ref=${{ github.event.client_payload.ref }}
+          repo=${{ github.event.client_payload.repository }}
       
 #       - name: action turnstyle
 #         uses: softprops/turnstyle@v0.1.2
@@ -39,7 +43,7 @@ jobs:
       
       - name: Restore zh-docs-dm-cache
         uses: actions/cache@v2
-        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
+        if: resository == 'yinixu9506/docs-dm'
         id: zh-docs-dm-cache
         with: 
           path: ./markdown-pages/contents/zh/docs-dm
