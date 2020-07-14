@@ -17,9 +17,6 @@ jobs:
       - name: print payload sha
         run: |
           'echo "field: ${{ github.event.client_payload.sha }}, ${{ github.event.client_payload.ref }}, ${{ github.event.client_payload.repository }}"'
-          echo '::set-env name=sha::${{ github.event.client_payload.sha }}'
-          echo '::set-env name=ref::${{ github.event.client_payload.ref }}'
-          echo '::set-env name=repo::${{ github.event.client_payload.repository }}'
       
 #       - name: action turnstyle
 #         uses: softprops/turnstyle@v0.1.2
@@ -43,13 +40,13 @@ jobs:
       
       - name: Restore zh-docs-dm-cache
         uses: actions/cache@v2
-        if: $repo == 'yinixu9506/docs-dm'
+        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
         id: zh-docs-dm-cache
         with: 
           path: ./markdown-pages/contents/zh/docs-dm
-          key: ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+          key: ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
           restore-keys: | 
-            ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+            ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
             ${{ runner.os }}-zh-docs-dm-cache-build-
             ${{ runner.os }}-zh
       
@@ -59,9 +56,9 @@ jobs:
         id: en-docs-dm-cache
         with: 
           path: ./markdown-pages/contents/en/docs-dm
-          key: ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+          key: ${{ runner.os }}-en-docs-dm-cache-build-$ref-$sha
           restore-keys: | 
-            ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.sha }}
+            ${{ runner.os }}-en-docs-dm-cache-build-$ref-$sha
             ${{ runner.os }}-en-docs-dm-cache-build-
             ${{ runner.os }}-en
             
@@ -76,14 +73,12 @@ jobs:
         run: 'echo "ref: ${{ steps.git-ref.outputs.ref }}"'
       
       - name: test list
-        run: | 
-           ls /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/docs-dm/master/
-           ls /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/docs-dm/master/
+        run: |
            echo "sdfasfdsa" >> /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/docs-dm/master/hash.txt
            cat /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/docs-dm/master/hash.txt
             
       - name: Sync docs-dm
-        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
+        if: $ == 'yinixu9506/docs-dm'
         run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync docs-dm ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }}
 
       - name: Restore gatsby cache
