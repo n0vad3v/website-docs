@@ -171,7 +171,7 @@ function sync(argv) {
 
   switch (repo) {
     case 'docs-tidb-operator':
-      handleSync({ owner: 'pingcap', repo, ref, sha, lastSha }, [
+      handleSync({ owner: 'yinixu9506', repo, ref, sha, lastSha }, [
         () => createReplaceImagePathStream(TIDB_IN_KUBERNETES_IMAGE_CDN_URL),
         () => createReplaceCopyableStream(),
         () => createReplaceTabPanelStream(),
@@ -179,7 +179,7 @@ function sync(argv) {
 
       break
     case 'docs-dm':
-      handleSync({ owner: 'pingcap', repo, ref, sha, lastSha }, [
+      handleSync({ owner: 'yinixu9506', repo, ref, sha, lastSha }, [
         () => createReplaceImagePathStream(TIDB_DATA_MIGRATION_IMAGE_CDN_URL),
         () => createReplaceCopyableStream(),
         () => createReplaceTabPanelStream(),
@@ -188,7 +188,7 @@ function sync(argv) {
       break
 
     case 'dbaas-docs':
-      handleSync({ owner: 'pingcap', repo, ref, sha, lastSha }, [
+      handleSync({ owner: 'yinixu9506', repo, ref, sha, lastSha }, [
         () => createReplaceImagePathStream(TIDB_CLOUD_IMAGE_CDN_URL),
         () => createReplaceCopyableStream(),
         () => createReplaceTabPanelStream(),
