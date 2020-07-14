@@ -57,6 +57,9 @@ jobs:
       
       - name: Get ref
         run: 'echo "ref: ${{ steps.git-ref.outputs.ref }}"'
+      
+      - name: test list
+        run: ls /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/docs-dm/master/
 
       - name: Sync zh-docs-dm
         run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync docs-dm ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }}
