@@ -12,7 +12,7 @@
 
 ## How to develop
 
-After clone this repo, run `yarn` to get all deps:
+After clone this repo, run `yarn` to get all deps:aadaf
 
 ```sh
 yarn
