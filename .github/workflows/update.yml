@@ -40,8 +40,14 @@ jobs:
             ${{ runner.os }}-markdown-contents-cache
             ${{ runner.os }}-
             
+      - name: File Existence
+        uses: andstor/file-existence-action@v1.0.1
+        id: check_files
+        with:
+          files: "./markdown-pages/contents/"
+
       - name: Check restore status
-        if: if [ ! -f "./markdown-pages/contents/" ]
+        if: steps.check_files.outputs.files_exists != 'true'
         run: ｜
           GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:all
           GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dbaas
@@ -51,7 +57,7 @@ jobs:
           
       - name: Split ref
         id: git-ref
-        if: if [ -f "./markdown-pages/contents/" ]
+        if: steps.check_files.outputs.files_exists == 'true'
         run: |
           ref=${{ github.event.client_payload.ref }}
           repo=${{ github.event.client_payload.repository }}
@@ -59,12 +65,12 @@ jobs:
           echo "::set-output name=repo::${repo##*/}"
           
       - name: Get ref
-        if: if [ -f "./markdown-pages/contents/" ]
+        if: steps.check_files.outputs.files_exists == 'true'
         run: |
           echo "get ${{ steps.git-ref.outputs.ref }}, ${{ steps.git-ref.outputs.repo }} "
       
       - name: Get last cache commit hash
-        if: if [ -f "./markdown-pages/contents/" ]
+        if: steps.check_files.outputs.files_exists == 'true'
         id: cache-commit
         run: |
            path=/home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
