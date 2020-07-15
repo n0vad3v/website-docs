@@ -8,14 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.client_payload.ref }}
           
       - name: Turnstyle
         uses: softprops/turnstyle@v1
-      
-#       - name: action turnstyle
-#         uses: softprops/turnstyle@v0.1.2
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -34,46 +29,43 @@ jobs:
       - name: Install deps
         run: yarn
       
-      - name: Restore zh-docs-dm-cache
+      - name: Restore markdown contents
         uses: actions/cache@v2
-        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
-        id: zh-docs-dm-cache
+        id: markdown-contents
         with: 
-          path: ./markdown-pages/contents/zh/docs-dm
-          key: ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
+          path: ./markdown-pages/contents/
+          key: ${{ runner.os }}-markdown-contents-cache-${{ github.event.client_payload.sha }}
           restore-keys: | 
-            ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
-            ${{ runner.os }}-zh-docs-dm-cache-build-${{ github.event.client_payload.ref }}
-            ${{ runner.os }}-zh
-      
-      - name: Restore en-docs-dm-cache
-        uses: actions/cache@v2
-        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
-        id: en-docs-dm-cache
-        with: 
-          path: ./markdown-pages/contents/en/docs-dm
-          key: ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
-          restore-keys: | 
-            ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.ref }}-${{ github.event.client_payload.sha }}
-            ${{ runner.os }}-en-docs-dm-cache-build-${{ github.event.client_payload.ref }}
-            ${{ runner.os }}-en
+            ${{ runner.os }}-markdown-contents-cache-${{ github.event.client_payload.sha }}
+            ${{ runner.os }}-markdown-contents-cache
+            ${{ runner.os }}-
             
+      - name: Check restore status
+        if: if [ ! -f "./markdown-pages/contents/" ]
+        run: ｜
+          GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:all
+          GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dbaas
+          GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb-operator:all
+          GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb:en:all
+          GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb:zh:all
+          
       - name: Split ref
         id: git-ref
+        if: if [ -f "./markdown-pages/contents/" ]
         run: |
           ref=${{ github.event.client_payload.ref }}
           repo=${{ github.event.client_payload.repository }}
           echo "::set-output name=ref::${ref##*/}"
           echo "::set-output name=repo::${repo##*/}"
           
-      
       - name: Get ref
+        if: if [ -f "./markdown-pages/contents/" ]
         run: |
           echo "get ${{ steps.git-ref.outputs.ref }}, ${{ steps.git-ref.outputs.repo }} "
       
       - name: Get last cache commit hash
+        if: if [ -f "./markdown-pages/contents/" ]
         id: cache-commit
-        if: ${{ steps.git-ref.outputs.repo != 'website-docs' }}
         run: |
            path=/home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
            hash=""
@@ -84,9 +76,8 @@ jobs:
            echo "get cache hash: $hash"
            echo "::set-output name=hash::${hash}"
             
-      - name: Sync docs-dm
-        if: ${{ github.event.client_payload.repository }} == 'yinixu9506/docs-dm'
-        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync docs-dm ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }} ${{ steps.cache-commit.outputs.hash }}
+      - name: Sync docs
+        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync ${{ steps.git-ref.outputs.repo }} ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }} ${{ steps.cache-commit.outputs.hash }}
 
       - name: Restore gatsby cache
         uses: actions/cache@v2
@@ -118,8 +109,8 @@ jobs:
         run: ls ./public
 
       - name: Update cache commit hash
-        if: ${{ steps.git-ref.outputs.repo != 'website-docs' }}
         run: echo "${{ github.event.client_payload.sha }}" > /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
+        run: echo "${{ github.event.client_payload.sha }}" > /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
 #       - name: cat new page
 #         run : cat ./public/newPages.txt
       
