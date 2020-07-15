@@ -1,0 +1,28 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: test cache share
+
+on:
+  push:
+    branches: 
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Restore dm cache
+        uses: actions/cache@v2
+        id: gatsby-cache
+        with:
+          path: ./markdown-pages/contents/zh/docs-dm
+          key: ${{ runner.os }}-zh-docs-dm-cache-build-i-am-testing
+          restore-keys: |
+            ${{ runner.os }}-zh-docs-dm-cache-build-i-am-testing
+            ${{ runner.os }}-zh-docs-dm-cache-build-
+        
+      - name: Download docs-dm
+        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:all
