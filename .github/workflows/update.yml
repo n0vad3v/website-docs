@@ -34,10 +34,10 @@ jobs:
         id: markdown-contents
         with: 
           path: ./markdown-pages/contents/
-          key: ${{ runner.os }}-markdown-contents-cache-${{ github.event.client_payload.sha }}
+          key: ${{ runner.os }}-markdown-contents-cache2-${{ github.event.client_payload.sha }}
           restore-keys: | 
-            ${{ runner.os }}-markdown-contents-cache-${{ github.event.client_payload.sha }}
-            ${{ runner.os }}-markdown-contents-cache
+            ${{ runner.os }}-markdown-contents-cache2-${{ github.event.client_payload.sha }}
+            ${{ runner.os }}-markdown-contents-cache2
             ${{ runner.os }}-
             
       - name: File Existence
