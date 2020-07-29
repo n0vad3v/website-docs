@@ -51,6 +51,10 @@ jobs:
         id: check_files
         with:
           files: "./markdown-pages/contents/"
+          
+          
+      - name: list content
+        run: ls ./markdown-pages/contents/
 
       - name: Check restore status
         if: steps.check_files.outputs.files_exists != 'true'
