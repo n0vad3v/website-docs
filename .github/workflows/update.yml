@@ -67,7 +67,6 @@ jobs:
           
       - name: Split ref
         id: git-ref
-        if: steps.check_files.outputs.files_exists == 'true' && steps.git-ref.outputs.repo != 'website-docs'
         run: |
           ref=${{ github.event.client_payload.ref }}
           repo=${{ github.event.client_payload.repo }}
@@ -75,7 +74,6 @@ jobs:
           echo "::set-output name=repo::${repo##*/}"
           
       - name: Get ref
-        if: steps.check_files.outputs.files_exists == 'true' && steps.git-ref.outputs.repo != 'website-docs'
         run: |
           echo "get ${{ steps.git-ref.outputs.ref }}, ${{ steps.git-ref.outputs.repo }}"
       
@@ -92,7 +90,7 @@ jobs:
            echo "::set-output name=hash::${hash}"
             
       - name: Sync docs
-        if: steps.git-ref.outputs.repo != 'website-docs' && steps.check_files.outputs.files_exists == 'true'
+        if: steps.check_files.outputs.files_exists == 'true' && steps.git-ref.outputs.repo != 'website-docs'
         run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync ${{ steps.git-ref.outputs.repo }} ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }} ${{ steps.cache-commit.outputs.hash }}
 
       - name: Restore gatsby cache
