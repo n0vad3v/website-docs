@@ -27,7 +27,7 @@ jobs:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: YiniXu9506/website-docs
           event-type: triggered
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "repository": "${{ github.repository }}"}'
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "repo": "${{ github.repository }}"}'
 
     # Runs a single command using the runners shell
     - name: Run a one-line script
