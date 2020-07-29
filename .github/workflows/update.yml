@@ -73,13 +73,13 @@ jobs:
       - name: Get ref
         if: steps.check_files.outputs.files_exists == 'true' && steps.git-ref.outputs.repo != 'website-docs'
         run: |
-          echo "get ${{ steps.git-ref.outputs.ref }}, ${{ steps.git-ref.outputs.repo }} "
+          echo "get ${{ steps.git-ref.outputs.ref }}, ${{ steps.git-ref.outputs.repo }}"
       
       - name: Get last cache commit hash
         if: steps.check_files.outputs.files_exists == 'true' && steps.git-ref.outputs.repo != 'website-docs'
         id: cache-commit
         run: |
-           path=/home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
+           path=/home/runner/work/website-docs/website-docs/markdown-pages/contents/${{ steps.git-ref.outputs.repo }}-${{ steps.git-ref.outputs.ref }}-hash.lock
            hash=""
            if [ -f "$path" ];then
            hash=$(cat $path)  
@@ -123,8 +123,7 @@ jobs:
       - name: Update cache commit hash
         if: steps.git-ref.outputs.repo != 'website-docs'
         run: |
-          echo "${{ github.event.client_payload.sha }}" > /home/runner/work/website-docs/website-docs/markdown-pages/contents/zh/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
-          echo "${{ github.event.client_payload.sha }}" > /home/runner/work/website-docs/website-docs/markdown-pages/contents/en/${{ steps.git-ref.outputs.repo }}/${{ steps.git-ref.outputs.ref }}/hash.lock
+          echo "${{ github.event.client_payload.sha }}" > /home/runner/work/website-docs/website-docs/markdown-pages/contents/${{ steps.git-ref.outputs.repo }}-${{ steps.git-ref.outputs.ref }}-hash.lock
 #       - name: cat new page
 #         run : cat ./public/newPages.txt
       
