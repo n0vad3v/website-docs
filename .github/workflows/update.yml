@@ -41,7 +41,7 @@ jobs:
         with: 
           path: ./markdown-pages/contents/
           key: ${{ runner.os }}-new-markdown-contents-cache-${{ github.event.client_payload.sha }}
-          restore-keys: | 
+          restore-keys: |
             ${{ runner.os }}-new-markdown-contents-cache-${{ github.event.client_payload.sha }}
             ${{ runner.os }}-new-markdown-contents-cache
             ${{ runner.os }}-
@@ -58,7 +58,7 @@ jobs:
 
       - name: Check restore status
         if: steps.check_files.outputs.files_exists != 'true'
-        run: ｜
+        run: |
           GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:all
           GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dbaas
           GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb-operator:all
