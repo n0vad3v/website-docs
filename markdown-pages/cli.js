@@ -18,7 +18,7 @@ const argv = yargs
     'specify which repo of docs you want to download'
   )
   .command(
-    'sync <repo> <ref> <base> [head]',
+    'sync <repo> <ref> <base> <head>',
     "Sync the docs' changes by a single commit"
   ).argv
 

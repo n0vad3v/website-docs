@@ -78,7 +78,7 @@ async function retrieveAllMDs(metaInfo, distDir, pipelines = []) {
 
 async function handleSync(metaInfo, pipelines = []) {
   const { owner, repo, ref, base, head } = metaInfo
-  if (head) {
+  if (base && head) {
     const { files } = (await getCommitInfo(owner, repo, base, head)).data
 
     files.forEach((file) => {
