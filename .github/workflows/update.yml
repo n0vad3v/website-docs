@@ -92,7 +92,7 @@ jobs:
            echo "::set-output name=hash::${hash}"
             
       - name: Sync docs
-        if: steps.git-ref.outputs.repo != 'website-docs'
+        if: steps.git-ref.outputs.repo != 'website-docs' && steps.check_files.outputs.files_exists == 'true'
         run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync ${{ steps.git-ref.outputs.repo }} ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }} ${{ steps.cache-commit.outputs.hash }}
 
       - name: Restore gatsby cache
