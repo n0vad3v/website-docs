@@ -41,7 +41,7 @@ jobs:
         with: 
           path: ./markdown-pages/contents/
           key: ${{ runner.os }}-new-markdown-contents-cache-${{ github.event.client_payload.sha }}
-          restore-keys: | 
+          restore-keys: |
             ${{ runner.os }}-new-markdown-contents-cache-${{ github.event.client_payload.sha }}
             ${{ runner.os }}-new-markdown-contents-cache
             ${{ runner.os }}-
@@ -50,11 +50,15 @@ jobs:
         uses: andstor/file-existence-action@v1.0.1
         id: check_files
         with:
-          files: "./markdown-pages/contents/"
+          files: "./markdown-pages/contents/en/docs-dm/master/_index.md"
+          
+          
+      - name: list content
+        run: ls ./markdown-pages/contents/
 
       - name: Check restore status
         if: steps.check_files.outputs.files_exists != 'true'
-        run: ｜
+        run: |
           GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dm:all
           GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-dbaas
           GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn download:docs-tidb-operator:all
@@ -63,7 +67,6 @@ jobs:
           
       - name: Split ref
         id: git-ref
-        if: steps.check_files.outputs.files_exists == 'true' && steps.git-ref.outputs.repo != 'website-docs'
         run: |
           ref=${{ github.event.client_payload.ref }}
           repo=${{ github.event.client_payload.repo }}
@@ -71,7 +74,6 @@ jobs:
           echo "::set-output name=repo::${repo##*/}"
           
       - name: Get ref
-        if: steps.check_files.outputs.files_exists == 'true' && steps.git-ref.outputs.repo != 'website-docs'
         run: |
           echo "get ${{ steps.git-ref.outputs.ref }}, ${{ steps.git-ref.outputs.repo }}"
       
@@ -88,8 +90,8 @@ jobs:
            echo "::set-output name=hash::${hash}"
             
       - name: Sync docs
-        if: steps.git-ref.outputs.repo != 'website-docs'
-        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync ${{ steps.git-ref.outputs.repo }} ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }} ${{ steps.cache-commit.outputs.hash }}
+        if: steps.check_files.outputs.files_exists == 'true' && steps.git-ref.outputs.repo != 'website-docs'
+        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync ${{ steps.git-ref.outputs.repo }} ${{ steps.git-ref.outputs.ref }} ${{ steps.cache-commit.outputs.hash }} ${{ github.event.client_payload.sha }} 
 
       - name: Restore gatsby cache
         uses: actions/cache@v2
@@ -114,6 +116,11 @@ jobs:
       - name: Build website
         run: GATSBY_EXPERIMENTAL_PAGE_BUILD_ON_DATA_CHANGES=true GATSBY_ALGOLIA_APPLICATION_ID=${{ secrets.ALGOLIA_APPLICATION_ID }} GATSBY_ALGOLIA_API_KEY=${{ secrets.ALGOLIA_API_KEY }} yarn build --write-to-file
 
+#       - name: cat changed and delete file
+#         run: |
+#           cat .cache/newPages.txt
+#           cat .cache/deletedPages.txt
+        
       - name: Move changed files from gatsby
         run: (yes|cp -f .cache/*Pages.txt public)|true
 
@@ -124,6 +131,12 @@ jobs:
         if: steps.git-ref.outputs.repo != 'website-docs'
         run: |
           echo "${{ github.event.client_payload.sha }}" > /home/runner/work/website-docs/website-docs/markdown-pages/contents/${{ steps.git-ref.outputs.repo }}-${{ steps.git-ref.outputs.ref }}-hash.lock
+      
+      - name: Update all commit hash
+        if: steps.check_files.outputs.files_exists != 'true'
+        run: |
+          ls ./scripts/
+          bash ./scripts/get-latest-commits.sh ${{ secrets.GH_TOKEN }}
 #       - name: cat new page
 #         run : cat ./public/newPages.txt
       
