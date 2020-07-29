@@ -91,7 +91,7 @@ jobs:
             
       - name: Sync docs
         if: steps.check_files.outputs.files_exists == 'true' && steps.git-ref.outputs.repo != 'website-docs'
-        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync ${{ steps.git-ref.outputs.repo }} ${{ steps.git-ref.outputs.ref }} ${{ github.event.client_payload.sha }} ${{ steps.cache-commit.outputs.hash }}
+        run: GITHUB_AUTHORIZATION_TOKEN=${{ secrets.GH_TOKEN }} yarn sync ${{ steps.git-ref.outputs.repo }} ${{ steps.git-ref.outputs.ref }} ${{ steps.cache-commit.outputs.hash }} ${{ github.event.client_payload.sha }} 
 
       - name: Restore gatsby cache
         uses: actions/cache@v2
