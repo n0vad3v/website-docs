@@ -3,12 +3,12 @@ on:
   repository_dispatch:
     types: [triggered]
 jobs:
-  run:
+  build-job:
     name: Build website
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+        
       - name: Print repo info
         run: |
           echo "${{ github.event.client_payload.repo }}"
@@ -126,7 +126,12 @@ jobs:
 
       - name: List public
         run: ls ./public
-
+      
+  store-commit-job:
+    name: Store commits
+    runs-on: ubuntu-latest
+    needs: build-job
+    steps:
       - name: Update cache commit hash
         if: steps.git-ref.outputs.repo != 'website-docs'
         run: |
@@ -137,15 +142,3 @@ jobs:
         run: |
           ls ./scripts/
           bash ./scripts/get-latest-commits.sh ${{ secrets.GH_TOKEN }}
-#       - name: cat new page
-#         run : cat ./public/newPages.txt
-      
-#       - name: cat deleted page
-#         run : cat ./public/deletedPages.txt
-
-      # - name: Deploy
-      #   run: |
-      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
-      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_2_HOST }}:${{ secrets.DEPLOY_PATH }}"
-      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.LA_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
-      #     rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.LA_2_HOST }}:${{ secrets.DEPLOY_PATH }}"
