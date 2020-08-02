@@ -76,48 +76,41 @@ async function retrieveAllMDs(metaInfo, distDir, pipelines = []) {
   })
 }
 
-async function handleSync(metaInfo, pipelines = []) {
-  const { owner, repo, ref, base, head } = metaInfo
-  if (base && head) {
-    const { files } = (await getCommitInfo(owner, repo, base, head)).data
+async function retrieveAllMDs(metaInfo, distDir, pipelines = []) {
+  const { owner, repo, ref, path } = metaInfo
 
-    files.forEach((file) => {
-      const { filename, status, raw_url } = file
+  const list = (await getContents(owner, repo, ref, path)).data
 
-      let path
-      if (repo === 'docs-tidb-operator' || repo === 'docs-dm') {
-        const base = filename.split('/').slice(1).join('/')
+  list.forEach((el) => {
+    const { name, type, download_url } = el
 
-        if (filename.startsWith('en')) {
-          path = `${__dirname}/contents/en/${repo}/${ref}/${base}`
-        } else if (filename.startsWith('zh')) {
-          path = `${__dirname}/contents/zh/${repo}/${ref}/${base}`
-        } else {
-          return
-        }
+    if (shouldIgnorePath(name)) {
+      return
+    }
+
+    if (type === 'dir') {
+      const nextDistDir = `${distDir}/${name}`
+
+      if (!fs.existsSync(nextDistDir)) {
+        fs.mkdirSync(nextDistDir)
       }
 
-      switch (status) {
-        case 'added':
-        case 'modified':
-          writeContent(raw_url, path, pipelines)
-
-          break
-        case 'removed':
-          fs.unlink(path, (err) => {
-            if (err) {
-              sig.error(`Fail to unlink ${path}: ${err}`)
-            } else {
-              sig.success(`Deleted: ${path}`)
-            }
-          })
-
-          break
-        default:
-          break
+      retrieveAllMDs(
+        {
+          owner,
+          repo,
+          ref,
+          path: `${path}/${name}`,
+        },
+        `${distDir}/${name}`,
+        pipelines
+      )
+    } else {
+      if (name.endsWith('.md')) {
+        writeContent(download_url, `${distDir}/${name}`, pipelines)
       }
-    })
-  }
+    }
+  })
 }
 
 module.exports = {
