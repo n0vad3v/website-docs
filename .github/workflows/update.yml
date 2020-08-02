@@ -136,11 +136,11 @@ jobs:
       - name: Move changed files from gatsby
         run: (yes|cp -f .cache/*Pages.txt public)|true
 
-      - name: cat new page
-        run : cat ./public/newPages.txt
+      # - name: cat new page
+      #   run : cat ./public/newPages.txt
       
-      - name: cat deleted page
-        run : cat ./public/deletedPages.txt
+      # - name: cat deleted page
+      #   run : cat ./public/deletedPages.txt
 
       - name: List public
         run: ls ./public
