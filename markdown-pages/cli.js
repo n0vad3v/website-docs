@@ -140,7 +140,7 @@ function main(argv) {
     case 'docs-dbaas':
       retrieveAllMDs(
         {
-          owner: 'pingcap',
+          owner: 'yinixu9506',
           repo: 'dbaas-docs',
           ref,
           path: path ? path : '',
