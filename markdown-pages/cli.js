@@ -258,6 +258,7 @@ function sync(argv) {
         // () => createReplaceTrailingWhiteSpaceStream(),
       ])
       break
+
     default:
       break
   }

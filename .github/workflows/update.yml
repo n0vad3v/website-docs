@@ -4,7 +4,7 @@ on:
     types: [triggered]
 jobs:
   build:
-    name: Retrieve docs and deploy the website
+    name: Build website
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,9 +23,6 @@ jobs:
         id: know-hosts
         run: |
           echo "::set-output name=BJ1::$(ssh-keyscan -H ${{ secrets.BJ_1_HOST }})"
-          echo "::set-output name=BJ2::$(ssh-keyscan -H ${{ secrets.BJ_2_HOST }})"
-          echo "::set-output name=LA1::$(ssh-keyscan -H ${{ secrets.LA_1_HOST }})"
-          echo "::set-output name=LA2::$(ssh-keyscan -H ${{ secrets.LA_2_HOST }})"
 
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
@@ -33,9 +30,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: |
             ${{ steps.know-hosts.outputs.BJ1 }}
-            ${{ steps.know-hosts.outputs.BJ2 }}
-            ${{ steps.know-hosts.outputs.LA1 }}
-            ${{ steps.know-hosts.outputs.LA2 }}
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -138,21 +132,8 @@ jobs:
       - name: Move changed files from gatsby
         run: (yes|cp -f .cache/*Pages.txt public)|true
 
-      - name: Deploy to LA1
-        run: |
-          rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.LA_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
-
-      - name: Deploy to LA2
-        run: |
-          rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.LA_2_HOST }}:${{ secrets.DEPLOY_PATH }}"
-
-      - name: Deploy to BJ1
-        run: |
-          rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
-
-      - name: Deploy to BJ2
-        run: |
-          rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_2_HOST }}:${{ secrets.DEPLOY_PATH }}"
+      - name: List public
+        run: ls ./public
 
       # update cache commit to corresponding file
       - name: Update cache commit hash
@@ -166,3 +147,7 @@ jobs:
         run: |
           ls ./scripts/
           bash ./scripts/get-latest-commits.sh ${{ secrets.GH_TOKEN }}
+
+      - name: Deploy to BJ1
+        run: |
+          rsync -avz --delete public/ "${{ secrets.SSH_USER }}@${{ secrets.BJ_1_HOST }}:${{ secrets.DEPLOY_PATH }}"
